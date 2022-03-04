@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
     const genre = await Genre.findById(req.body.genreId);
     if (!genre) return res.status(400).send('Invalid genre.');
 
-    let movie = new Movie({ 
+    let movie = new Movie({
         title: req.body.title,
         genre: {
             _id: genre._id,
@@ -35,14 +35,14 @@ router.put('/:id', async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    if(!validateId(req.params.id)) return res.status(404).send('The movie with the given ID was not found.');
+    if (!validateId(req.params.id)) return res.status(404).send('The movie with the given ID was not found.');
 
     const genre = await Genre.findById(req.body.genreId);
     if (!genre) return res.status(400).send('Invalid genre.');
 
     const movie = await Movie.findByIdAndUpdate(
-        req.params.id, 
-        { 
+        req.params.id,
+        {
             title: req.body.title,
             genre: {
                 _id: genre._id,
@@ -50,7 +50,7 @@ router.put('/:id', async (req, res) => {
             },
             numberInStock: req.body.numberInStock,
             dailyRentalRate: req.body.dailyRentalRate
-        }, 
+        },
         { new: true });
     if (!movie) return res.status(404).send('The movie with the given ID was not found.');
 
@@ -58,7 +58,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-    if(!validateId(req.params.id)) return res.status(404).send('The movie with the given ID was not found.');
+    if (!validateId(req.params.id)) return res.status(404).send('The movie with the given ID was not found.');
 
     const movie = await Movie.findByIdAndDelete(req.params.id);
     if (!movie) return res.status(404).send('The movie with the given ID was not found.');
@@ -67,7 +67,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-    if(!validateId(req.params.id)) return res.status(404).send('The movie with the given ID was not found.');
+    if (!validateId(req.params.id)) return res.status(404).send('The movie with the given ID was not found.');
 
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send('The movie with the given ID was not found.');
