@@ -57,21 +57,11 @@ const Rental = mongoose.model('Rental', new mongoose.Schema({
 
 function validateRental(rental) {
     const schema = Joi.object({
-        customerId: Joi.string().required(),
-        movieId: Joi.string().required()
+        customerId: Joi.objectId().required(),
+        movieId: Joi.objectId().required()
     });
     return schema.validate(rental);
 }
 
-function validateId(id) {
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        if ((String)(new mongoose.Types.ObjectId(id)) === id)
-            return true;
-        return false;
-    }
-    return false;
-}
-
 exports.Rental = Rental;
-exports.validate = validateGenre;
-exports.validateId = validateId;
+exports.validate = validateRental;

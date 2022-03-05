@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-const { Customer, validate, validateId } = require('../models/customer');
+const { Customer, validate } = require('../models/customer');
 
 router.get('/', async (req, res) => {
     const customers = await Customer.find().sort('name');
@@ -27,7 +27,7 @@ router.put('/:id', async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    if (!validateId(req.params.id)) return res.status(404).send('The customer with the given ID was not found.');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('Invalid customer.');
 
     const customer = await Customer.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
     if (!customer) return res.status(404).send('The customer with the given ID was not found.');
@@ -36,7 +36,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-    if (!validateId(req.params.id)) return res.status(404).send('The customer with the given ID was not found.');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('Invalid customer.');
 
     const customer = await Customer.findByIdAndDelete(req.params.id);
     if (!customer) return res.status(404).send('The customer with the given ID was not found.');
@@ -45,7 +45,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-    if (!validateId(req.params.id)) return res.status(404).send('The customer with the given ID was not found.');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('Invalid customer.');
 
     const customer = await Customer.findById(req.params.id);
     if (!customer) return res.status(404).send('The customer with the given ID was not found.');

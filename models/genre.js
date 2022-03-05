@@ -19,16 +19,6 @@ function validateGenre(genre) {
     return schema.validate(genre);
 }
 
-function validateId(id) {
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        if ((String)(new mongoose.Types.ObjectId(id)) === id)
-            return true;
-        return false;
-    }
-    return false;
-}
-
 exports.genreSchema = genreSchema;
 exports.Genre = Genre;
 exports.validate = validateGenre;
-exports.validateId = validateId;

@@ -31,22 +31,12 @@ const Movie = mongoose.model('Movie', new mongoose.Schema({
 function validateMovie(movie) {
     const schema = Joi.object({
         title: Joi.string().min(5).max(255).required(),
-        genreId: Joi.string().required(),
+        genreId: Joi.objectId().required(),
         numberInStock: Joi.number().min(0).max(255).required(),
         dailyRentalRate: Joi.number().min(0).max(255).required()
     });
     return schema.validate(movie);
 }
 
-function validateId(id) {
-    if (mongoose.Types.ObjectId.isValid(id)) {
-        if ((String)(new mongoose.Types.ObjectId(id)) === id)
-            return true;
-        return false;
-    }
-    return false;
-}
-
 exports.Movie = Movie;
-exports.validate = validateGenre;
-exports.validateId = validateId;
+exports.validate = validateMovie;
