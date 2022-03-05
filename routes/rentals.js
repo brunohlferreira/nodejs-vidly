@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
             dailyRentalRate: customer.dailyRentalRate
         }
     });
-    rental = await rental.save();
+    await rental.save();
 
     movie.numberInStock--;
     movie.save();
