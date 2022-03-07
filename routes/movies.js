@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const { Movie, validate } = require('../models/movie');
 const { Genre } = require('../models/genre');
 
@@ -58,7 +59,7 @@ router.put('/:id', auth, async (req, res) => {
     return res.send(movie);
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('Invalid movie.');
 
     const movie = await Movie.findByIdAndDelete(req.params.id);

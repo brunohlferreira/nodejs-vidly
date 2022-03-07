@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const { Genre, validate } = require('../models/genre');
 
 router.get('/', async (req, res) => {
@@ -32,7 +33,7 @@ router.put('/:id', auth, async (req, res) => {
     return res.send(genre);
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('Invalid genre.');
 
     const genre = await Genre.findByIdAndDelete(req.params.id);
