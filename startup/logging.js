@@ -4,6 +4,7 @@ require('express-async-errors');
 
 module.exports = function () {
     winston.exceptions.handle(
+        new winston.transports.Console(),
         new winston.transports.File({ filename: '../log/uncaughtExceptions.log' })
     );
     process.on('unhandledRejection', (ex) => {
@@ -13,6 +14,6 @@ module.exports = function () {
     winston.add(new winston.transports.MongoDB({ 
         db: 'mongodb://localhost/vidly',
         options: { useUnifiedTopology: true },
-        level: 'info'
+        level: 'error'
     }));
 }
