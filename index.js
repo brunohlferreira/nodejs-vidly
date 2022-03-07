@@ -4,6 +4,8 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const express = require('express');
 const app = express();
+const error = require('./middleware/error');
+require('express-async-errors');
 const auth = require('./routes/auth');
 const customers = require('./routes/customers');
 const genres = require('./routes/genres');
@@ -27,6 +29,7 @@ app.use('/api/genres', genres);
 app.use('/api/movies', movies);
 app.use('/api/rentals', rentals);
 app.use('/api/users', users);
+app.use(error);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
