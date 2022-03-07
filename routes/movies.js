@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
 const { Movie, validate } = require('../models/movie');
 const { Genre } = require('../models/genre');
 
