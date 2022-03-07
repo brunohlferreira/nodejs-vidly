@@ -6,12 +6,27 @@ const express = require('express');
 const app = express();
 const error = require('./middleware/error');
 require('express-async-errors');
+const winston = require('winston');
+require('winston-mongodb');
 const auth = require('./routes/auth');
 const customers = require('./routes/customers');
 const genres = require('./routes/genres');
 const movies = require('./routes/movies');
 const rentals = require('./routes/rentals');
 const users = require('./routes/users');
+
+winston.exceptions.handle(
+    new winston.transports.File({ filename: './log/uncaughtExceptions.log' })
+);
+process.on('unhandledRejection', (ex) => {
+    throw ex;
+});
+winston.add(new winston.transports.File({ filename: './log/errors.log' }));
+winston.add(new winston.transports.MongoDB({ 
+    db: 'mongodb://localhost/vidly',
+    options: { useUnifiedTopology: true },
+    level: 'error'
+}));
 
 if (!config.get('jwtPrivateKey')) {
     console.log('FATAL ERROR: jwtPrivateKey is not defined.');
