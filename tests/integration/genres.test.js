@@ -7,9 +7,9 @@ let server;
 
 describe('/api/genres', () => {
     beforeEach(() => { server = require('../../index'); });
-    afterEach(async () => { 
-        server.close();
-        await Genre.remove({}); 
+    afterEach(async () => {
+        await Genre.deleteMany({});
+        await server.close();
     });
 
     describe('GET /', () => {
@@ -32,7 +32,7 @@ describe('/api/genres', () => {
             const res = await request(server).get('/api/genres/1');
             expect(res.status).toBe(404);
         });
-        
+
         it('Should return genre with requested id', async () => {
             const genre = new Genre({ name: 'genre1' });
             await genre.save();
@@ -47,6 +47,11 @@ describe('/api/genres', () => {
         let token;
         let name;
 
+        beforeEach(() => {
+            token = new User().generateAuthToken();
+            name = 'genre1';
+        });
+
         // definition of happy path
         const exec = async () => {
             return await request(server)
@@ -54,11 +59,6 @@ describe('/api/genres', () => {
                 .set('x-auth-token', token)
                 .send({ name: name });
         }
-
-        beforeEach(() => {
-            token = new User().generateAuthToken();
-            name = 'genre1';
-        });
 
         it('Should return 401 if client is not logged in', async () => {
             token = '';
