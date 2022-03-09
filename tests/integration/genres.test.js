@@ -60,8 +60,8 @@ describe('/api/genres', () => {
         });
 
         // definition of happy path
-        const exec = async () => {
-            return await request(server)
+        const exec = () => {
+            return request(server)
                 .post('/api/genres')
                 .set('x-auth-token', token)
                 .send({ name: name });

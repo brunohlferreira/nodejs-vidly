@@ -15,8 +15,8 @@ describe('auth middleware', () => {
         await Genre.deleteMany({});
     });
 
-    const exec = async () => {
-        return await request(server)
+    const exec = () => {
+        return request(server)
             .post('/api/genres')
             .set('x-auth-token', token)
             .send({ name: 'genre1' });
