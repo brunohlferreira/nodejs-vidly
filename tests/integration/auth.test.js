@@ -8,12 +8,11 @@ describe('auth middleware', () => {
     let token;
 
     beforeEach(() => {
-        server = require('../../index');
+        server = require('../../app');
         token = new User().generateAuthToken();
     });
     afterEach(async () => {
         await Genre.deleteMany({});
-        await server.close();
     });
 
     const exec = async () => {

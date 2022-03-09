@@ -1,3 +1,4 @@
-node_modules
-/log/errors.log
-/log/uncaughtExceptions.log
+coverage/
+log/errors.log
+log/uncaughtExceptions.log
+node_modules/
