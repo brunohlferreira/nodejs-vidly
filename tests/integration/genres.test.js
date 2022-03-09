@@ -29,8 +29,14 @@ describe('/api/genres', () => {
     });
 
     describe('GET /:id', () => {
-        it('Should return 404 error if given id does not exist in db', async () => {
+        it('Should return 404 error if invalid id is passed', async () => {
             const res = await request(server).get('/api/genres/1');
+            expect(res.status).toBe(404);
+        });
+
+        it('Should return 404 error if given id does not exist in db', async () => {
+            const id = mongoose.Types.ObjectId();
+            const res = await request(server).get(`/api/genres/${id}`);
             expect(res.status).toBe(404);
         });
 
@@ -94,6 +100,104 @@ describe('/api/genres', () => {
         });
 
         it('Should return the genre if it is valid', async () => {
+            const res = await exec();
+
+            expect(res.body).toHaveProperty('_id');
+            expect(res.body).toHaveProperty('name', 'genre1');
+        });
+    });
+
+    describe('PUT /:id', () => {
+        let token;
+        let genre;
+        let id;
+        let name;
+
+        beforeEach(async () => {
+            token = new User().generateAuthToken();
+            genre = new Genre({ name: 'genre1' });
+            await genre.save();
+        });
+
+        // definition of happy path
+        const exec = async () => {
+            return await request(server)
+                .put(`/api/genres/${id}`)
+                .set('x-auth-token', token)
+                .send({ name: name });
+        }
+
+        it('Should return 400 if genre is less than 5 characters', async () => {
+            id = genre._id;
+            name = '1234';
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('Should return 400 if genre is more than 50 characters', async () => {
+            id = genre._id;
+            name = new Array(52).join('a');
+
+            const res = await exec();
+
+            expect(res.status).toBe(400);
+        });
+
+        it('Should return 404 error if given id was not found', async () => {
+            id = mongoose.Types.ObjectId();
+            name = 'genre2';
+
+            const res = await exec();
+
+            expect(res.status).toBe(404);
+        });
+
+        it('Should return the edited genre if it is valid', async () => {
+            id = genre._id;
+            name = 'genre2';
+
+            const res = await exec();
+
+            expect(res.body).toHaveProperty('_id');
+            expect(res.body).toHaveProperty('name', 'genre2');
+        });
+    });
+
+    describe('DELETE /:id', () => {
+        let token;
+        let genre;
+        let id;
+
+        beforeEach(async () => {
+            const user = new User({ 
+                _id: new mongoose.Types.ObjectId().toHexString(), 
+                isAdmin: true
+            });
+            token = user.generateAuthToken();
+            genre = new Genre({ name: 'genre1' });
+            await genre.save();
+        });
+
+        const exec = async () => {
+            return await request(server)
+                .delete(`/api/genres/${id}`)
+                .set('x-auth-token', token)
+                .send();
+        }
+
+        it('Should return 404 error if given id was not found', async () => {
+            id = mongoose.Types.ObjectId();
+
+            const res = await exec();
+
+            expect(res.status).toBe(404);
+        });
+
+        it('Should return the deleted genre if it is valid', async () => {
+            id = genre._id;
+
             const res = await exec();
 
             expect(res.body).toHaveProperty('_id');
