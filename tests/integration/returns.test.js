@@ -4,6 +4,7 @@ const { Movie } = require('../../models/movie');
 const { Rental } = require('../../models/rental');
 const { User } = require('../../models/user');
 
+let app;
 let server;
 let token;
 let customerId;
@@ -13,7 +14,8 @@ let rental;
 
 describe('/api/returns', () => {
     beforeEach(async () => {
-        server = require('../../app');
+        app = require('../../app');
+        server = app.listen();
         token = new User().generateAuthToken();
 
         customerId = mongoose.Types.ObjectId();
@@ -46,6 +48,7 @@ describe('/api/returns', () => {
     });
 
     afterEach(async () => {
+        await server.close();
         await Movie.deleteMany({});
         await Rental.deleteMany({});
     });

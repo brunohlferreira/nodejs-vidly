@@ -3,19 +3,22 @@ const mongoose = require('mongoose');
 const { Genre } = require('../../models/genre');
 const { User } = require('../../models/user');
 
+let app;
 let server;
 
 describe('/api/genres', () => {
     beforeEach(() => {
-        server = require('../../app');
+        app = require('../../app');
+        server = app.listen();
     });
     afterEach(async () => {
+        await server.close();
         await Genre.deleteMany({});
     });
 
     describe('GET /', () => {
         it('Should return all genres', async () => {
-            await Genre.collection.insertMany([
+            await Genre.insertMany([
                 { name: 'genre1' },
                 { name: 'genre2' }
             ]);
@@ -120,8 +123,8 @@ describe('/api/genres', () => {
         });
 
         // definition of happy path
-        const exec = async () => {
-            return await request(server)
+        const exec = () => {
+            return request(server)
                 .put(`/api/genres/${id}`)
                 .set('x-auth-token', token)
                 .send({ name: name });
@@ -180,8 +183,8 @@ describe('/api/genres', () => {
             await genre.save();
         });
 
-        const exec = async () => {
-            return await request(server)
+        const exec = () => {
+            return request(server)
                 .delete(`/api/genres/${id}`)
                 .set('x-auth-token', token)
                 .send();
