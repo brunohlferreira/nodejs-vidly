@@ -7,25 +7,19 @@ const { Movie } = require('../models/movie');
 const { Rental } = require('../models/rental');
 
 router.post('/', [auth, validateRequestBody(validate)], async (req, res) => {
-    const rental = await Rental.findOne({ 
-        'customer._id': req.body.customerId,
-        'movie._id': req.body.movieId
-    });
+    const rental = await Rental.lookup(req.body.customerId, req.body.movieId);
     if (!rental) return res.status(404).send('The rental was not found.');
-    
+
     if (rental.dateReturned) return res.status(400).send('Return was already processed.');
 
-    rental.dateReturned = new Date();
-    const diff = rental.dateReturned - rental.dateOut;
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    rental.rentalFee = days * rental.movie.dailyRentalRate;
+    rental.return();
     await rental.save();
-    
+
     await Movie.updateOne({ _id: rental.movie._id }, {
         $inc: { numberInStock: 1 }
     });
 
-    return res.status(200).send(rental);
+    return res.send(rental);
 });
 
 function validate(req) {
