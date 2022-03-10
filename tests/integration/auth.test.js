@@ -1,47 +1,60 @@
 const request = require('supertest');
-const { Genre } = require('../../models/genre');
+const bcrypt = require('bcrypt');
 const { User } = require('../../models/user');
 
 let app;
 let server;
 
-describe('auth middleware', () => {
-    let token;
+describe('/api/auth', () => {
+    let user;
+    let email;
+    let password;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         app = require('../../app');
         server = app.listen();
-        token = new User().generateAuthToken();
+        user = new User({
+            name: 'User1', 
+            email: 'email@email.com',
+            password: 'password'
+        });
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+        await user.save();
     });
     afterEach(async () => {
         await server.close();
-        await Genre.deleteMany({});
+        await User.deleteMany({});
     });
 
     const exec = () => {
         return request(app)
-            .post('/api/genres')
-            .set('x-auth-token', token)
-            .send({ name: 'genre1' });
+            .post('/api/auth')
+            .send({ email, password });
     }
 
-    it('Should return 401 if no token is provided', async () => {
-        token = '';
-
-        const res = await exec();
-
-        expect(res.status).toBe(401);
-    });
-
-    it('Should return 400 if token is invalid', async () => {
-        token = 'a';
+    it('Should return 400 if invalid email', async () => {
+        email = 'email2@email.com';
+        password = 'password';
 
         const res = await exec();
 
         expect(res.status).toBe(400);
     });
 
-    it('Should return 200 if token is valid', async () => {
+    it('Should return 400 if invalid password', async () => {
+        email = 'email@email.com';
+        password = 'password1';
+
+        const res = await exec();
+
+        expect(res.status).toBe(400);
+    });
+
+    it('Should return 200 if valid user', async () => {
+        email = 'email@email.com';
+        password = 'password';
+
         const res = await exec();
 
         expect(res.status).toBe(200);

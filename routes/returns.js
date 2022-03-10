@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
 const auth = require('../middleware/auth');
-const validate = require('../middleware/validate');
+const validateRequestBody = require('../middleware/validateRequestBody');
 const { Movie } = require('../models/movie');
 const { Rental } = require('../models/rental');
 
-router.post('/', [auth, validate(validateReturn)], async (req, res) => {
+router.post('/', [auth, validateRequestBody(validate)], async (req, res) => {
     const rental = await Rental.findOne({ 
         'customer._id': req.body.customerId,
         'movie._id': req.body.movieId
@@ -28,7 +28,7 @@ router.post('/', [auth, validate(validateReturn)], async (req, res) => {
     return res.status(200).send(rental);
 });
 
-function validateReturn(req) {
+function validate(req) {
     const schema = Joi.object({
         customerId: Joi.objectId().required(),
         movieId: Joi.objectId().required()

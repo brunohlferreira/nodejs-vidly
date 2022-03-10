@@ -23,7 +23,8 @@ describe('/api/genres', () => {
                 { name: 'genre2' }
             ]);
 
-            const res = await request(server).get('/api/genres');
+            const res = await request(app).get('/api/genres');
+
             expect(res.status).toBe(200);
             expect(res.body.length).toBe(2);
             expect(res.body.some(g => g.name === 'genre1')).toBeTruthy();
@@ -33,13 +34,15 @@ describe('/api/genres', () => {
 
     describe('GET /:id', () => {
         it('Should return 404 error if invalid id is passed', async () => {
-            const res = await request(server).get('/api/genres/1');
+            const res = await request(app).get('/api/genres/1');
+
             expect(res.status).toBe(404);
         });
 
         it('Should return 404 error if given id does not exist in db', async () => {
             const id = mongoose.Types.ObjectId();
-            const res = await request(server).get(`/api/genres/${id}`);
+            const res = await request(app).get(`/api/genres/${id}`);
+
             expect(res.status).toBe(404);
         });
 
@@ -47,7 +50,8 @@ describe('/api/genres', () => {
             const genre = new Genre({ name: 'genre1' });
             await genre.save();
 
-            const res = await request(server).get(`/api/genres/${genre._id}`);
+            const res = await request(app).get(`/api/genres/${genre._id}`);
+
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('name', genre.name);
         });
@@ -64,7 +68,7 @@ describe('/api/genres', () => {
 
         // definition of happy path
         const exec = () => {
-            return request(server)
+            return request(app)
                 .post('/api/genres')
                 .set('x-auth-token', token)
                 .send({ name: name });
@@ -124,7 +128,7 @@ describe('/api/genres', () => {
 
         // definition of happy path
         const exec = () => {
-            return request(server)
+            return request(app)
                 .put(`/api/genres/${id}`)
                 .set('x-auth-token', token)
                 .send({ name: name });
@@ -184,7 +188,7 @@ describe('/api/genres', () => {
         });
 
         const exec = () => {
-            return request(server)
+            return request(app)
                 .delete(`/api/genres/${id}`)
                 .set('x-auth-token', token)
                 .send();

@@ -2,20 +2,18 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const validateRequestBody = require('../middleware/validateRequestBody');
 const { Rental, validate } = require('../models/rental');
 const { Customer } = require('../models/customer');
 const { Movie } = require('../models/movie');
 
 router.get('/', async (req, res) => {
-    const rentals = await Rental.find().sort('-dateOut');
+    const rentals = await Rental.find({}).sort('-dateOut');
 
     return res.send(rentals);
 });
 
-router.post('/', auth, async (req, res) => {
-    const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
+router.post('/', [auth, validateRequestBody(validate)], async (req, res) => {
     const customer = await Customer.findById(req.body.customerId);
     if (!customer) return res.status(400).send('Invalid customer.');
 
@@ -31,9 +29,9 @@ router.post('/', auth, async (req, res) => {
             phone: customer.phone
         },
         movie: {
-            _id: customer._id,
-            title: customer.title,
-            dailyRentalRate: customer.dailyRentalRate
+            _id: movie._id,
+            title: movie.title,
+            dailyRentalRate: movie.dailyRentalRate
         }
     });
     await rental.save();

@@ -6,17 +6,16 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const validateRequestBody = require('../middleware/validateRequestBody');
 const { User, validate } = require('../models/user');
 
 router.get('/me', auth, async (req, res) => {
     const user = await User.findById(req.user._id).select('-password -__v');
-    res.send(user);
+
+    return res.send(user);
 });
 
-router.post('/', async (req, res) => {
-    const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
+router.post('/', validateRequestBody(validate), async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
     if (user) return res.status(400).send('User already registered.');
 
